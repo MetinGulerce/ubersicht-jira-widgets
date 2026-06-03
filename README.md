@@ -27,9 +27,20 @@ Bu widget'lar standart Übersicht `.jsx` API'sini kullandigi icin cogu durumda v
 
 Her kullanici kendi makinesinde `~/.jira_env` dosyasi olusturmalidir.
 
-1. `jira_config_example.env` dosyasini kopyala.
+Hizli baslangic icin widget klasorlerinin icine dogrudan doldurulabilir bos sablonlar eklendi:
+
+- `JiraTasks.widget/.env.example`
+- `JiraTeamRadar.widget/.env.example`
+
+En pratik yol:
+
+1. Bu dosyalardan birini kopyala.
 2. Kopyayi `~/.jira_env` olarak kaydet.
 3. Degerleri kendi Jira bilgilerinle doldur.
+
+Istersen `~/.jira_env` yerine widget klasorunde `.env` olarak da kullanabilirsin.
+
+Detayli ornek ve aciklamalar icin `jira_config_example.env` dosyasi da repoda duruyor.
 
 Ornek:
 
