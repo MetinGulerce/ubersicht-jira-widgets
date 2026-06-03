@@ -368,7 +368,8 @@ TMP=$(mktemp)
 write_request() {
   local jql="$1"
   local escaped_jql
-  escaped_jql=$(printf '%s' "$jql" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  escaped_jql="\${jql//\\/\\\\}"
+  escaped_jql="\${escaped_jql//\"/\\\"}"
   cat > "\${TMP}.json" << EOF
 {
   "jql": "\${escaped_jql}",
