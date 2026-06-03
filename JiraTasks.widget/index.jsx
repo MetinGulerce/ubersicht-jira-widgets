@@ -364,14 +364,21 @@ URL_V2="\${BASE_URL}/rest/api/2/search"
 
 # Modern Jira Cloud API çağrısı - v3 YENİ endpoint ile (POST olarak)
 TMP=$(mktemp)
-# JSON string'i dosyaya yazarak güvenli hale getir
-cat > "\${TMP}.json" << EOF
+
+write_request() {
+  local jql="$1"
+  local escaped_jql
+  escaped_jql=$(printf '%s' "$jql" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  cat > "\${TMP}.json" << EOF
 {
-  "jql": "\${JQL}",
+  "jql": "\${escaped_jql}",
   "maxResults": \${MAX_RESULTS},
   "fields": ["summary","description","priority","status","updated","duedate","assignee","issuetype","project"]
 }
 EOF
+}
+
+write_request "\${JQL}"
 
 HTTP_CODE=$(curl -sS --max-time 8 -X POST -H "Accept: application/json" \\
   -H "Content-Type: application/json" \\
@@ -384,13 +391,7 @@ rm -f "\${TMP}.json"
 # 400 dönerse daha gevşek sorgu (status filtresi bile yok)
 if [ "\${HTTP_CODE}" = "400" ]; then
   JQL_FB="\${ASSIGNEE_FILTER} AND sprint in openSprints() ORDER BY priority DESC, updated DESC"
-  cat > "\${TMP}.json" << EOF
-{
-  "jql": "\${JQL_FB}",
-  "maxResults": \${MAX_RESULTS},
-  "fields": ["summary","description","priority","status","updated","duedate","assignee","issuetype","project"]
-}
-EOF
+  write_request "\${JQL_FB}"
   HTTP_CODE=$(curl -sS --max-time 8 -X POST -H "Accept: application/json" \\
     -H "Content-Type: application/json" \\
     -H "User-Agent: Ubersicht-JiraTasks/1.0" \\
