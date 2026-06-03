@@ -1,0 +1,9 @@
+.DS_Store
+**/.DS_Store
+.env
+**/.env
+*.local
+*.local.env
+**/.git.backup/
+GitHubPRs.widget/
+gitlab_config_example.env
