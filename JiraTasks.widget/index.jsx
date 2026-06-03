@@ -33,6 +33,55 @@ export const className = `
   }
   .jira-list { display: grid; gap: 8px; }
 
+  .jira-group {
+    background: linear-gradient(135deg, rgba(23,43,77,0.45), rgba(9,30,66,0.45));
+    border: 1px solid rgba(0,101,255,0.16);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .jira-group[open] {
+    border-color: rgba(0,101,255,0.3);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  }
+  .jira-group-summary {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+  }
+  .jira-group-summary::-webkit-details-marker { display: none; }
+  .jira-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .jira-group-meta {
+    margin-top: 4px;
+    font-size: 10px;
+    color: #9fb7dc;
+    line-height: 1.4;
+  }
+  .jira-group-chevron {
+    color: #9fb7dc;
+    font-size: 12px;
+    font-weight: 700;
+    transition: transform .2s ease;
+  }
+  .jira-group[open] .jira-group-chevron {
+    transform: rotate(180deg);
+  }
+  .jira-group-body {
+    display: grid;
+    gap: 8px;
+    padding: 0 12px 12px;
+    border-top: 1px solid rgba(0,101,255,0.12);
+  }
+
   .jira-item {
     display: grid;
     grid-template-columns: 1fr max-content;
@@ -46,7 +95,7 @@ export const className = `
     transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
     border-left: 3px solid transparent;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
   }
   .jira-item::before {
     content: '';
@@ -57,6 +106,8 @@ export const className = `
     bottom: 0;
     background: linear-gradient(135deg, rgba(0,101,255,0.05), transparent);
     opacity: 0;
+    pointer-events: none;
+    border-radius: inherit;
     transition: opacity .2s ease;
   }
   .jira-item:hover {
@@ -123,6 +174,11 @@ export const className = `
     border-color: rgba(222,53,11,0.4); 
     background: linear-gradient(135deg, #DE350B, #BF2600);
   }
+  .chip-assignee {
+    color: #ffffff;
+    border-color: rgba(94,108,132,0.35);
+    background: linear-gradient(135deg, #42526E, #5E6C84);
+  }
   .chip-branch { 
     color: #ffffff; 
     background: linear-gradient(135deg, #00875A, #36B37E); 
@@ -141,6 +197,46 @@ export const className = `
     padding: 4px 8px;
     font-weight: 600;
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  }
+  .jira-key-button {
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .jira-key-button::-webkit-details-marker { display: none; }
+  .jira-preview {
+    position: relative;
+    align-self: start;
+  }
+  .jira-preview-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 220px;
+    z-index: 8;
+    background: linear-gradient(180deg, rgba(7,11,24,.98), rgba(14,23,43,.98));
+    border: 1px solid rgba(0,101,255,0.24);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.28);
+  }
+  .jira-preview-key {
+    font-size: 10px;
+    color: #9fb7dc;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: 0.4px;
+  }
+  .jira-preview-title {
+    font-size: 11px;
+    color: #ffffff;
+    line-height: 1.45;
+    font-weight: 600;
+  }
+  .jira-preview-meta {
+    margin-top: 8px;
+    font-size: 10px;
+    color: #9fb7dc;
   }
   .jira-footer {
     font-size: 11px;
@@ -183,7 +279,7 @@ export const className = `
   }
 
   /* Done grupları - Jira tarzı */
-  .done-groups { margin-top: 10px; display: grid; gap: 6px; }
+  .done-groups { display: grid; gap: 6px; }
   .done-row { 
     display: grid; 
     grid-template-columns: 70px 1fr; 
@@ -224,6 +320,26 @@ done
 BASE_URL="\${JIRA_BASE_URL}"
 EMAIL="\${JIRA_EMAIL}"
 TOKEN="\${JIRA_API_TOKEN}"
+TEAM_IDS="\${JIRA_TEAM_ACCOUNT_IDS}"
+
+SCOPE="self"
+TEAM_COUNT=0
+MAX_RESULTS=30
+
+if [ -n "\${TEAM_IDS}" ]; then
+  CLEAN_IDS=$(printf '%s' "\${TEAM_IDS}" | tr ',' '\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' || true)
+  if [ -n "\${CLEAN_IDS}" ]; then
+    FORMATTED_IDS=$(printf '%s\n' "\${CLEAN_IDS}" | sed 's/"/\\"/g; s/.*/"&"/' | paste -sd, -)
+    ASSIGNEE_FILTER="assignee in (\${FORMATTED_IDS})"
+    TEAM_COUNT=$(printf '%s\n' "\${CLEAN_IDS}" | grep -c . | tr -d ' ')
+    SCOPE="team"
+    MAX_RESULTS=100
+  else
+    ASSIGNEE_FILTER='assignee=currentUser()'
+  fi
+else
+  ASSIGNEE_FILTER='assignee=currentUser()'
+fi
 
 if [ -z "\${BASE_URL}" ] || [ -z "\${EMAIL}" ] || [ -z "\${TOKEN}" ]; then
   missing="[]"
@@ -239,7 +355,7 @@ if [ -z "\${BASE_URL}" ] || [ -z "\${EMAIL}" ] || [ -z "\${TOKEN}" ]; then
 fi
 
 # JQL'i plain yaz, encoding'i curl yapsın (rejected hariç, unresolved filtresi yok)
-JQL='assignee=currentUser() AND sprint in openSprints() AND status not in (Rejected, Declined, Canceled) ORDER BY priority DESC, updated DESC'
+JQL="\${ASSIGNEE_FILTER} AND sprint in openSprints() AND status not in (Rejected, Declined, Canceled) ORDER BY priority DESC, updated DESC"
 
 # Güncel Jira Cloud API endpoint'leri (2024-2025) - YENİ /search/jql endpoint
 # Base URL formatı: https://your-domain.atlassian.net
@@ -252,7 +368,7 @@ TMP=$(mktemp)
 cat > "\${TMP}.json" << EOF
 {
   "jql": "\${JQL}",
-  "maxResults": 30,
+  "maxResults": \${MAX_RESULTS},
   "fields": ["summary","description","priority","status","updated","duedate","assignee","issuetype","project"]
 }
 EOF
@@ -267,11 +383,11 @@ rm -f "\${TMP}.json"
 
 # 400 dönerse daha gevşek sorgu (status filtresi bile yok)
 if [ "\${HTTP_CODE}" = "400" ]; then
-  JQL_FB='assignee=currentUser() AND sprint in openSprints() ORDER BY priority DESC, updated DESC'
+  JQL_FB="\${ASSIGNEE_FILTER} AND sprint in openSprints() ORDER BY priority DESC, updated DESC"
   cat > "\${TMP}.json" << EOF
 {
   "jql": "\${JQL_FB}",
-  "maxResults": 30,
+  "maxResults": \${MAX_RESULTS},
   "fields": ["summary","description","priority","status","updated","duedate","assignee","issuetype","project"]
 }
 EOF
@@ -288,28 +404,28 @@ if [ "\${HTTP_CODE}" = "410" ] || [ "\${HTTP_CODE}" = "404" ]; then
   HTTP_CODE=$(curl -sS --max-time 8 -G -H "Accept: application/json" \\
     -H "User-Agent: Ubersicht-JiraTasks/1.0" \\
     --data-urlencode "jql=\${JQL}" \\
-    --data-urlencode "maxResults=30" \\
+    --data-urlencode "maxResults=\${MAX_RESULTS}" \
     --data-urlencode "fields=summary,description,priority,status,updated,duedate,assignee,issuetype,project" \\
     -u "\${EMAIL}:\${TOKEN}" "\${URL_V2}" -o "\${TMP}" -w "%{http_code}")
 
   # v2 ile de 400 dönerse gevşek sorgu
   if [ "\${HTTP_CODE}" = "400" ]; then
-    JQL_FB='assignee=currentUser() AND sprint in openSprints() ORDER BY priority DESC, updated DESC'
+    JQL_FB="\${ASSIGNEE_FILTER} AND sprint in openSprints() ORDER BY priority DESC, updated DESC"
     HTTP_CODE=$(curl -sS --max-time 8 -G -H "Accept: application/json" \\
       -H "User-Agent: Ubersicht-JiraTasks/1.0" \\
       --data-urlencode "jql=\${JQL_FB}" \\
-      --data-urlencode "maxResults=30" \\
+      --data-urlencode "maxResults=\${MAX_RESULTS}" \
       --data-urlencode "fields=summary,description,priority,status,updated,duedate,assignee,issuetype,project" \\
       -u "\${EMAIL}:\${TOKEN}" "\${URL_V2}" -o "\${TMP}" -w "%{http_code}")
   fi
   
   # v2 ile de 410/404 dönerse son çare: sprint filtresi olmadan
   if [ "\${HTTP_CODE}" = "410" ] || [ "\${HTTP_CODE}" = "404" ]; then
-    JQL_LAST='assignee=currentUser() AND updated >= -30d AND status not in (Done, Closed, Resolved, Rejected, Declined, Canceled) ORDER BY priority DESC, updated DESC'
+    JQL_LAST="\${ASSIGNEE_FILTER} AND updated >= -30d AND status not in (Done, Closed, Resolved, Rejected, Declined, Canceled) ORDER BY priority DESC, updated DESC"
     HTTP_CODE=$(curl -sS --max-time 8 -G -H "Accept: application/json" \\
       -H "User-Agent: Ubersicht-JiraTasks/1.0" \\
       --data-urlencode "jql=\${JQL_LAST}" \\
-      --data-urlencode "maxResults=20" \\
+      --data-urlencode "maxResults=\${MAX_RESULTS}" \
       --data-urlencode "fields=summary,description,priority,status,updated,duedate,assignee,issuetype,project" \\
       -u "\${EMAIL}:\${TOKEN}" "\${URL_V2}" -o "\${TMP}" -w "%{http_code}")
   fi
@@ -321,7 +437,7 @@ rm -f "\${TMP}"
 NOW=$(date -u +"%FT%TZ")
 
 if [ "\${HTTP_CODE}" = "200" ]; then
-  printf '{"ok":true,"baseUrl":"%s","data":%s,"lastChecked":"%s"}\n' "\${BASE_URL}" "\${BODY}" "\${NOW}"
+  printf '{"ok":true,"baseUrl":"%s","scope":"%s","teamCount":%s,"data":%s,"lastChecked":"%s"}\n' "\${BASE_URL}" "\${SCOPE}" "\${TEAM_COUNT}" "\${BODY}" "\${NOW}"
 else
   # Hata koduna göre daha açıklayıcı mesajlar
   case "\${HTTP_CODE}" in
@@ -514,7 +630,15 @@ export const render = ({ output, error }) => {
   }
 
   const baseUrl = data.baseUrl || '';
+  const scope = data.scope || 'self';
+  const isTeamScope = scope === 'team';
+  const configuredTeamCount = Number(data.teamCount || 0);
   const allIssues = (data.data && data.data.issues) ? data.data.issues : [];
+  const activePeopleCount = new Set(
+    allIssues
+      .map((it) => it.fields?.assignee?.accountId || it.fields?.assignee?.displayName)
+      .filter(Boolean)
+  ).size;
 
   // Jira issue URL yardımcıları (branch -> KEY -> URL)
   const toIssueUrl = (maybeKey) => {
@@ -530,6 +654,47 @@ export const render = ({ output, error }) => {
   const urlForBranch = (branch, fallbackKey) => {
     const key = issueKeyFromBranch(branch) || fallbackKey || '';
     return toIssueUrl(key);
+  };
+
+  const latestUpdatedAt = (items) => items.reduce((latest, issue) => {
+    const updated = issue.fields?.updated;
+    if (!updated) return latest;
+    if (!latest) return updated;
+    return new Date(updated) > new Date(latest) ? updated : latest;
+  }, '');
+
+  const uniqueAssigneeCount = (items) => new Set(
+    items
+      .map((issue) => issue.fields?.assignee?.accountId || issue.fields?.assignee?.displayName)
+      .filter(Boolean)
+  ).size;
+
+  const buildGroupSummary = (items, extras = []) => {
+    const parts = [`${items.length} iş`];
+    if (isTeamScope) {
+      const assigneeCount = uniqueAssigneeCount(items);
+      if (assigneeCount) parts.push(`${assigneeCount} kişi`);
+    }
+    const latest = latestUpdatedAt(items);
+    if (latest) parts.push(`son güncelleme ${fmtRel(latest)}`);
+    extras.filter(Boolean).forEach((extra) => parts.push(extra));
+    return parts.join(' • ');
+  };
+
+  const renderGroup = (groupKey, label, items, summary, children) => {
+    if (!items || items.length === 0) return null;
+    return (
+      <details key={groupKey} className="jira-group">
+        <summary className="jira-group-summary">
+          <div>
+            <div className="jira-group-title">{label}</div>
+            <div className="jira-group-meta">{summary}</div>
+          </div>
+          <div className="jira-group-chevron">▾</div>
+        </summary>
+        <div className="jira-group-body">{children}</div>
+      </details>
+    );
   };
 
   // Gruplama + done kırılım sayacı
@@ -561,6 +726,7 @@ export const render = ({ output, error }) => {
     const stat = f.status?.name;
     const due = f.duedate;
     const key = it.key;
+    const assigneeName = f.assignee?.displayName || 'Atanmamış';
     const title = doneMode ? key : safe(f.summary);
     const url = baseUrl ? `${baseUrl}/browse/${key}` : '';
     const prioClass = (() => {
@@ -585,6 +751,7 @@ export const render = ({ output, error }) => {
           {!doneMode && (
             <div className="jira-meta">
               {stat ? <span className="chip chip-status">{stat}</span> : null}
+              {isTeamScope ? <span className="chip chip-assignee">{assigneeName}</span> : null}
               {/* priority chip kaldırıldı */}
               {due ? <span className="chip chip-due">Son Tarih {new Date(due).toLocaleDateString('tr-TR')}</span> : null}
               {f.updated ? <span className="chip">Güncel {fmtRel(f.updated)} önce</span> : null}
@@ -627,7 +794,14 @@ export const render = ({ output, error }) => {
               )}
           </div>
         ) : (
-          <div className="jira-key">{key}</div>
+          <details className="jira-preview" onClick={(e) => e.stopPropagation()}>
+            <summary className="jira-key jira-key-button" onClick={(e) => e.stopPropagation()}>{key}</summary>
+            <div className="jira-preview-popover" onClick={(e) => e.stopPropagation()}>
+              <div className="jira-preview-key">{key}</div>
+              <div className="jira-preview-title">{safe(f.summary) || 'Başlık yok'}</div>
+              <div className="jira-preview-meta">Atalı: {assigneeName}</div>
+            </div>
+          </details>
         )}
       </div>
     );
@@ -701,12 +875,17 @@ export const render = ({ output, error }) => {
   // Progress hesapları
   const totalCount = groups.todo.length + groups.inprogress.length + groups.doneCount;
   const percent = totalCount ? Math.round((groups.doneCount / totalCount) * 100) : 0;
+  const headerTitle = isTeamScope ? 'Jira Aktif Görevler' : 'Jira Görevlerim (Aktif Sprint)';
+  const headerMetaPrefix = isTeamScope
+    ? `Takım • ${activePeopleCount || configuredTeamCount || 0} kişi`
+    : '';
 
   return (
     <div className="jira-container">
       <div className="jira-header">
-        <span>Jira Görevlerim (Aktif Sprint)</span>
+        <span>{headerTitle}</span>
         <span style={{ fontSize: 10, color: '#9a9a9a' }}>
+          {headerMetaPrefix ? `${headerMetaPrefix} • ` : ''}
           {data.lastChecked ? new Date(data.lastChecked).toLocaleTimeString('tr-TR') : ''}
         </span>
       </div>
@@ -715,25 +894,28 @@ export const render = ({ output, error }) => {
         <div style={{ fontSize: 11, color: '#c8c8c8' }}>Görev bulunamadı.</div>
       ) : (
         <div className="jira-list">
-          {groups.todo.length > 0 && (
-            <div>
-              <div style={{ fontSize: 10, color: '#9a9a9a', margin: '2px 0 4px' }}>
-                Yapılacak ({groups.todo.length})
-              </div>
-              {groups.todo.map((it) => renderItem(it))}
-            </div>
+          {renderGroup(
+            'todo',
+            'Yapılacak',
+            groups.todo,
+            buildGroupSummary(groups.todo),
+            groups.todo.map((it) => renderItem(it))
           )}
-          {groups.inprogress.length > 0 && (
-            <div>
-              <div style={{ fontSize: 10, color: '#9a9a9a', margin: '6px 0 4px' }}>
-                Devam Ediyor ({groups.inprogress.length})
-              </div>
-              {groups.inprogress.map((it) => renderItem(it))}
-            </div>
+
+          {renderGroup(
+            'inprogress',
+            'Devam Ediyor',
+            groups.inprogress,
+            buildGroupSummary(groups.inprogress),
+            groups.inprogress.map((it) => renderItem(it))
           )}
-          {groups.done.length > 0 && (
+
+          {renderGroup(
+            'done',
+            'Tamamlanan',
+            groups.done,
+            buildGroupSummary(groups.done, doneParts),
             <div className="done-groups">
-              {/* Tek satır chip satırları */}
               {renderDoneRow('RFT', groups.doneGroups.rft)}
               {renderDoneRow('TEST', groups.doneGroups.it)}
               {renderDoneRow('R-UAT', groups.doneGroups.rfu)}

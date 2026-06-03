@@ -51,6 +51,13 @@ JIRA_API_TOKEN="atlassian-api-token"
 JIRA_TEAM_ACCOUNT_IDS="account-id-1,account-id-2,account-id-3"
 ```
 
+`JIRA_TEAM_ACCOUNT_IDS` alani opsiyoneldir.
+
+- Bos birakilirsa `JiraTasks.widget` sadece kendi gorevlerini gosterir.
+- Doldurulursa `JiraTasks.widget` takimdaki kullanicilarin aktif gorevlerini listeler.
+- `JiraTeamRadar.widget` zaten ayni listeyi takim ozeti icin kullanir.
+- JiraTasks icinde durum gruplari varsayilan olarak dar gelir; acildiginda ilgili gorevleri gorursunuz.
+
 ## Jira Token Alma
 
 1. https://id.atlassian.com/manage-profile/security/api-tokens adresine git.
@@ -61,7 +68,7 @@ Token'i repoya commit etme. Her ekip uyesi kendi token'ini kendi olusturmali.
 
 ## Takim Uyesi Guncelleme
 
-`JiraTeamRadar.widget` takimdaki kisileri `JIRA_TEAM_ACCOUNT_IDS` degiskeninden okur. Kisi listesi degistiginde sadece bu alani guncellemek yeterlidir.
+`JiraTeamRadar.widget` ve takim modundaki `JiraTasks.widget` kullanicilari `JIRA_TEAM_ACCOUNT_IDS` degiskeninden okur. Kisi listesi degistiginde sadece bu alani guncellemek yeterlidir.
 
 Widget kisi isimlerini Jira'dan otomatik alir; kod icinde sabit isim listesi yoktur.
 
