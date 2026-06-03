@@ -18,6 +18,10 @@ export const className = `
     padding: 10px;
     backdrop-filter: blur(10px) saturate(120%);
     box-shadow: 0 6px 16px rgba(0,0,0,0.22);
+    max-height: calc(100vh - 12px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .radar-header {
@@ -134,14 +138,84 @@ export const className = `
     }
   }
 
-  .team-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .team-grid::-webkit-scrollbar { width: 6px; }
+  .team-grid::-webkit-scrollbar-thumb {
+    background: rgba(120,156,255,0.28);
+    border-radius: 999px;
+  }
 
   .card {
-    display: grid; grid-template-columns: 60px 1fr; gap: 10px;
-    align-items: center;
     background: linear-gradient(180deg, rgba(18,20,28,.4), rgba(12,14,18,.35));
     border: 1px solid rgba(120,156,255,0.14);
-    border-radius: 10px; padding: 8px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card[open] {
+    border-color: rgba(120,156,255,0.26);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+  }
+  .card summary {
+    list-style: none;
+  }
+  .card summary::-webkit-details-marker {
+    display: none;
+  }
+  .card-summary {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+  }
+  .card-summary:hover {
+    background: rgba(255,255,255,0.04);
+  }
+  .card-main {
+    min-width: 0;
+  }
+  .card-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .card-counts {
+    font-size: 12px;
+    font-weight: 800;
+    color: #eaf1ff;
+    white-space: nowrap;
+  }
+  .card-expand {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #9fb0d9;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .card-expand::before {
+    content: '▾';
+    transition: transform 0.2s ease;
+  }
+  .card[open] .card-expand::before {
+    transform: rotate(180deg);
+  }
+  .card-body {
+    padding: 0 8px 10px 8px;
+    border-top: 1px solid rgba(255,255,255,0.08);
   }
   .avatar {
     width: 58px; height: 58px; border-radius: 12px;
@@ -525,7 +599,9 @@ export const render = ({ output, error }) => {
     }
   });
 
-  const memberCards = Object.entries(members).map(([accId, m]) => {
+  const memberCards = Object.entries(members)
+    .sort(([, memberA], [, memberB]) => memberA.name.localeCompare(memberB.name, 'tr-TR'))
+    .map(([accId, m]) => {
     const counts = { todo:0, inprogress:0, rft:0, it:0, rfu:0, uat:0, rfp:0, done:0 };
     const tasksByStatus = { todo:[], inprogress:[], rft:[], it:[], rfu:[], uat:[], rfp:[], done:[] };
     
@@ -555,6 +631,7 @@ export const render = ({ output, error }) => {
     const total = Object.values(counts).reduce((a,b)=>a+b,0);
     const doneAll = counts.rft + counts.it + counts.rfu + counts.uat + counts.rfp + counts.done;
     const p = percent(doneAll, total);
+    const compactTotal = `${doneAll}/${total || 0}`;
 
     const handleStatusClick = (status, e) => {
       e.stopPropagation();
@@ -574,15 +651,24 @@ export const render = ({ output, error }) => {
     );
 
     return (
-      <div key={accId} className="card" style={{ position: 'relative' }}>
-        <div className="avatar">
-          <div className="ring" style={{ ['--p']: `${p*3.6}deg` }}>
-            <div className="ring-inner">{p}%</div>
+      <details key={accId} className="card">
+        <summary className="card-summary">
+          <div className="avatar">
+            <div className="ring" style={{ ['--p']: `${p*3.6}deg` }}>
+              <div className="ring-inner">{p}%</div>
+            </div>
           </div>
-        </div>
-        <div>
-          <div className="name">{m.name}</div>
-          <div className="meta">{total} iş • {doneAll} tamamlanan</div>
+          <div className="card-main">
+            <div className="card-topline">
+              <div className="name">{m.name}</div>
+              <div className="card-counts">{compactTotal}</div>
+            </div>
+            <div className="meta">{doneAll} tamamlanan / {total} iş</div>
+          </div>
+          <div className="card-expand">Detay</div>
+        </summary>
+        <div className="card-body">
+          <div className="meta" style={{ marginTop: 8 }}>{total} iş • {doneAll} tamamlanan</div>
           <div className="bars">
             <Bar label="TODO"     val={counts.todo}       color="linear-gradient(90deg,#8899aa,#aabccc)" status="todo" />
             <Bar label="Devam"    val={counts.inprogress} color="linear-gradient(90deg,#4c83ff,#6ea2ff)" status="inprogress" />
@@ -594,7 +680,7 @@ export const render = ({ output, error }) => {
             <Bar label="Done"     val={counts.done}       color="linear-gradient(90deg,#52c41a,#95de64)" status="done" />
           </div>
         </div>
-      </div>
+      </details>
     );
   });
 
@@ -637,14 +723,6 @@ export const render = ({ output, error }) => {
       cardElement.insertAdjacentHTML('beforeend', detailHTML);
     }
   };
-
-  // Üyeleri alfabetik sırala; paylaşılan widget belirli bir kullanıcıya göre davranmasın
-  memberCards.sort((a, b) => {
-    const nameA = a.props.children[1].props.children[0].props.children;
-    const nameB = b.props.children[1].props.children[0].props.children;
-
-    return nameA.localeCompare(nameB, 'tr-TR');
-  });
 
   // Debug: Tüm status'leri göster
   const allStatuses = teamIssues.map(it => it.fields?.status?.name).filter(Boolean);
