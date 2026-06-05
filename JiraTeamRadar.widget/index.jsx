@@ -599,8 +599,16 @@ export const render = ({ output, error }) => {
     }
   });
 
+  const isPinnedMember = (name) =>
+    (name || '').trim().localeCompare('Metin Gülerce', 'tr-TR', { sensitivity: 'base' }) === 0;
+
   const memberCards = Object.entries(members)
-    .sort(([, memberA], [, memberB]) => memberA.name.localeCompare(memberB.name, 'tr-TR'))
+    .sort(([, memberA], [, memberB]) => {
+      const aPinned = isPinnedMember(memberA.name);
+      const bPinned = isPinnedMember(memberB.name);
+      if (aPinned !== bPinned) return aPinned ? -1 : 1;
+      return memberA.name.localeCompare(memberB.name, 'tr-TR');
+    })
     .map(([accId, m]) => {
     const counts = { todo:0, inprogress:0, rft:0, it:0, rfu:0, uat:0, rfp:0, done:0 };
     const tasksByStatus = { todo:[], inprogress:[], rft:[], it:[], rfu:[], uat:[], rfp:[], done:[] };

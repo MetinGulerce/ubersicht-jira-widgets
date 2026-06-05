@@ -49,13 +49,18 @@ JIRA_BASE_URL="https://your-domain.atlassian.net"
 JIRA_EMAIL="isim@firma.com"
 JIRA_API_TOKEN="atlassian-api-token"
 JIRA_TEAM_ACCOUNT_IDS="account-id-1,account-id-2,account-id-3"
+JIRA_TASKS_VIEW_MODE="developer"
 ```
 
 `JIRA_TEAM_ACCOUNT_IDS` alani opsiyoneldir.
 
+`JIRA_TASKS_VIEW_MODE` alani da opsiyoneldir.
+
 - Bos birakilirsa `JiraTasks.widget` sadece kendi gorevlerini gosterir.
 - Doldurulursa `JiraTasks.widget` takimdaki kullanicilarin aktif gorevlerini listeler.
 - `JiraTeamRadar.widget` zaten ayni listeyi takim ozeti icin kullanir.
+- `JIRA_TASKS_VIEW_MODE="developer"` varsayilan davranistir.
+- `JIRA_TASKS_VIEW_MODE="product"` secilirse `RFT` ve `TEST`, `Tamamlanan` grubundan ayri ust gruplar olarak gosterilir.
 - JiraTasks icinde durum gruplari varsayilan olarak dar gelir; acildiginda ilgili gorevleri gorursunuz.
 
 ## Jira Token Alma

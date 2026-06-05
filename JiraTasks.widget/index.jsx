@@ -31,13 +31,160 @@ export const className = `
     align-items: center;
     letter-spacing: 0.3px;
   }
+  .jira-toolbar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .jira-toolbar.is-single {
+    grid-template-columns: 1fr;
+  }
+  .jira-filter {
+    position: relative;
+    min-width: 0;
+    overflow: visible;
+  }
+  .jira-filter-summary {
+    appearance: none;
+    width: 100%;
+    border: 1px solid rgba(0,101,255,0.22);
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(23,43,77,0.5), rgba(9,30,66,0.5));
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .jira-filter.is-open .jira-filter-summary {
+    border-color: rgba(0,101,255,0.38);
+    box-shadow: 0 0 0 1px rgba(0,101,255,0.12);
+  }
+  .jira-filter-label {
+    font-size: 9px;
+    color: #9fb7dc;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-weight: 700;
+  }
+  .jira-filter-value {
+    margin-top: 3px;
+    font-size: 10px;
+    color: #ffffff;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .jira-filter-chevron {
+    color: #9fb7dc;
+    font-size: 12px;
+    font-weight: 700;
+    transition: transform .2s ease;
+  }
+  .jira-filter.is-open .jira-filter-chevron {
+    transform: rotate(180deg);
+  }
+  .jira-filter-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 100%;
+    min-width: 190px;
+    z-index: 12;
+    display: grid;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid rgba(0,101,255,0.24);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(7,11,24,.98), rgba(14,23,43,.98));
+    box-shadow: 0 14px 28px rgba(0,0,0,0.28);
+  }
+  .jira-filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .jira-filter-action {
+    appearance: none;
+    border: 1px solid rgba(0,101,255,0.24);
+    background: rgba(9,30,66,0.72);
+    color: #b3d4ff;
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .jira-filter-action:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .jira-filter-options {
+    display: grid;
+    gap: 4px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .jira-filter-option {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 7px;
+    color: #ffffff;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .jira-filter-option-simple {
+    grid-template-columns: 14px 1fr;
+  }
+  .jira-filter-option:hover {
+    background: rgba(0,101,255,0.12);
+  }
+  .jira-filter-option input {
+    margin: 0;
+    accent-color: #4c9aff;
+  }
+  .jira-filter-option input[type="radio"] {
+    accent-color: #36b37e;
+  }
+  .jira-filter-option-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .jira-filter-option-count {
+    font-size: 10px;
+    color: #9fb7dc;
+  }
   .jira-list { display: grid; gap: 8px; }
+  .jira-list {
+    max-height: min(58vh, 620px);
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .jira-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .jira-list::-webkit-scrollbar-thumb {
+    background: rgba(76,154,255,0.3);
+    border-radius: 999px;
+  }
 
   .jira-group {
     background: linear-gradient(135deg, rgba(23,43,77,0.45), rgba(9,30,66,0.45));
     border: 1px solid rgba(0,101,255,0.16);
     border-radius: 10px;
-    overflow: hidden;
+    overflow: visible;
   }
   .jira-group[open] {
     border-color: rgba(0,101,255,0.3);
@@ -80,17 +227,18 @@ export const className = `
     gap: 8px;
     padding: 0 12px 12px;
     border-top: 1px solid rgba(0,101,255,0.12);
+    overflow: visible;
   }
 
   .jira-item {
     display: grid;
     grid-template-columns: 1fr max-content;
-    gap: 8px;
+    gap: 6px;
     align-items: start;
     background: linear-gradient(135deg, rgba(23,43,77,0.6), rgba(9,30,66,0.6));
     border: 1px solid rgba(0,101,255,0.15);
     border-radius: 10px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     cursor: pointer;
     transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
     border-left: 3px solid transparent;
@@ -124,9 +272,9 @@ export const className = `
   .jira-item.prio-low  { border-left-color: #36B37E; }
 
   .jira-title {
-    font-size: 12px;
+    font-size: 11px;
     color: #ffffff;
-    line-height: 1.4;
+    line-height: 1.32;
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -136,14 +284,14 @@ export const className = `
   }
   .jira-meta {
     display: flex;
-    gap: 6px;
-    margin-top: 6px;
+    gap: 4px;
+    margin-top: 4px;
     flex-wrap: wrap;
   }
   .chip {
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1.2;
-    padding: 3px 8px;
+    padding: 2px 7px;
     border-radius: 6px;
     background: rgba(9,30,66,0.7);
     border: 1px solid rgba(0,101,255,0.3);
@@ -194,7 +342,7 @@ export const className = `
     background: rgba(0,101,255,0.15);
     border: 1px solid rgba(0,101,255,0.3);
     border-radius: 6px;
-    padding: 4px 8px;
+    padding: 3px 7px;
     font-weight: 600;
     font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   }
@@ -208,12 +356,15 @@ export const className = `
     position: relative;
     align-self: start;
   }
+  .jira-preview[open] {
+    z-index: 18;
+  }
   .jira-preview-popover {
     position: absolute;
     top: calc(100% + 6px);
     right: 0;
     width: 220px;
-    z-index: 8;
+    z-index: 18;
     background: linear-gradient(180deg, rgba(7,11,24,.98), rgba(14,23,43,.98));
     border: 1px solid rgba(0,101,255,0.24);
     border-radius: 10px;
@@ -237,6 +388,23 @@ export const className = `
     margin-top: 8px;
     font-size: 10px;
     color: #9fb7dc;
+  }
+  .chip-button {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+  }
+  .chip-button::-webkit-details-marker { display: none; }
+  .done-preview .jira-preview-popover {
+    left: 0;
+    right: auto;
+    width: 230px;
+  }
+  .chip-branch-focus {
+    background: linear-gradient(135deg, #0065FF, #2684FF);
+    border-color: rgba(76,154,255,0.55);
   }
   .jira-footer {
     font-size: 11px;
@@ -287,6 +455,13 @@ export const className = `
     gap: 8px;
     padding: 6px 0;
   }
+  .done-row.done-row-spotlight {
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin: 0 -4px;
+    background: linear-gradient(135deg, rgba(0,101,255,0.1), rgba(54,179,126,0.05));
+    border: 1px solid rgba(76,154,255,0.16);
+  }
   .done-title { 
     font-size: 11px; 
     color: #8993A4; 
@@ -294,6 +469,9 @@ export const className = `
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+  .done-title.done-title-spotlight {
+    color: #dbe8ff;
   }
   .chips-row { 
     display: flex; 
@@ -321,6 +499,12 @@ BASE_URL="\${JIRA_BASE_URL}"
 EMAIL="\${JIRA_EMAIL}"
 TOKEN="\${JIRA_API_TOKEN}"
 TEAM_IDS="\${JIRA_TEAM_ACCOUNT_IDS}"
+VIEW_MODE_RAW="\${JIRA_TASKS_VIEW_MODE}"
+
+VIEW_MODE=$(printf '%s' "\${VIEW_MODE_RAW}" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')
+if [ "\${VIEW_MODE}" != "product" ]; then
+  VIEW_MODE="developer"
+fi
 
 SCOPE="self"
 TEAM_COUNT=0
@@ -441,7 +625,7 @@ rm -f "\${TMP}"
 NOW=$(date -u +"%FT%TZ")
 
 if [ "\${HTTP_CODE}" = "200" ]; then
-  printf '{"ok":true,"baseUrl":"%s","scope":"%s","teamCount":%s,"data":%s,"lastChecked":"%s"}\n' "\${BASE_URL}" "\${SCOPE}" "\${TEAM_COUNT}" "\${BODY}" "\${NOW}"
+  printf '{"ok":true,"baseUrl":"%s","scope":"%s","teamCount":%s,"viewModeKey":"%s","data":%s,"lastChecked":"%s"}\n' "\${BASE_URL}" "\${SCOPE}" "\${TEAM_COUNT}" "\${VIEW_MODE}" "\${BODY}" "\${NOW}"
 else
   # Hata koduna göre daha açıklayıcı mesajlar
   case "\${HTTP_CODE}" in
@@ -459,6 +643,14 @@ else
   printf '{"ok":false,"statusCode":"%s","error":"%s","body":"%s","lastChecked":"%s"}\n' "\${HTTP_CODE}" "\${ERROR_MSG}" "\${TRUNC}" "\${NOW}"
 fi
 `;
+
+export const initialState = {
+  output: '',
+  error: null,
+  selectedAssigneeIds: null,
+  recencyFilterKey: 'all',
+  openMenuKey: null
+};
 
 const fmtRel = (iso) => {
   if (!iso) return '';
@@ -613,36 +805,207 @@ const extractBranches = (issue) => {
   return branches.slice(0, 6).map(b => (b.length > 24 ? b.slice(0, 23) + '…' : b));
 };
 
-export const render = ({ output, error }) => {
-  if (error) {
-    return <div className="jira-container">Hata: {String(error)}</div>;
-  }
-  let data = {};
-  try { data = JSON.parse(output || '{}'); } catch { data = {}; }
+const getAssigneeFilterId = (issue) => {
+  const assignee = issue.fields?.assignee;
+  if (assignee?.accountId) return assignee.accountId;
+  if (assignee?.displayName) return `name:${assignee.displayName}`;
+  return '__unassigned__';
+};
 
-  if (!data.ok) {
-    const missing = (data.missing || []).join(', ');
-    return (
-      <div className="jira-container">
-        <div className="jira-header">Jira Görevlerim</div>
-        <div style={{ fontSize: 11, color: '#c8c8c8' }}>
-          {data.error || 'Çıktı okunamadı.'}
-          {missing ? <div>Eksik: {missing}</div> : null}
-        </div>
-      </div>
-    );
+const getAssigneeLabel = (issue) => issue.fields?.assignee?.displayName || 'Atanmamış';
+
+const RECENCY_FILTER_OPTIONS = [
+  { key: 'all', label: 'Tümü', summary: 'Tümü' },
+  { key: '24h', label: 'Son 24 saat', summary: '24 saat', hours: 24 },
+  { key: '3d', label: 'Son 3 gün', summary: '3 gün', hours: 72 },
+  { key: '7d', label: 'Son 7 gün', summary: '7 gün', hours: 168 }
+];
+
+const RECENCY_FILTER_MAP = RECENCY_FILTER_OPTIONS.reduce((acc, option) => {
+  acc[option.key] = option;
+  return acc;
+}, {});
+
+const normalizeViewModeKey = (value) => (value === 'product' ? 'product' : 'developer');
+
+const matchesRecencyFilter = (issue, filterKey, nowTs = Date.now()) => {
+  if (filterKey === 'all') return true;
+  const option = RECENCY_FILTER_MAP[filterKey];
+  const updated = issue.fields?.updated;
+  if (!option || !updated) return false;
+  return nowTs - new Date(updated).getTime() <= option.hours * 60 * 60 * 1000;
+};
+
+const getAssigneeOptionIdsFromOutput = (output) => {
+  try {
+    const data = JSON.parse(output || '{}');
+    const issues = Array.isArray(data?.data?.issues) ? data.data.issues : [];
+    return Array.from(new Set(issues.map((issue) => getAssigneeFilterId(issue)).filter(Boolean)));
+  } catch {
+    return [];
+  }
+};
+
+export const updateState = (event, previousState = initialState) => {
+  if (event.type === 'TOGGLE_MENU') {
+    return {
+      ...previousState,
+      openMenuKey: previousState.openMenuKey === event.menuKey ? null : event.menuKey
+    };
   }
 
+  if (event.type === 'CLOSE_FILTER_MENUS') {
+    if (!previousState.openMenuKey) return previousState;
+    return {
+      ...previousState,
+      openMenuKey: null
+    };
+  }
+
+  if (event.type === 'ASSIGNEE_FILTER_CHANGED') {
+    return {
+      ...previousState,
+      selectedAssigneeIds: Array.isArray(event.selectedAssigneeIds) ? event.selectedAssigneeIds : null,
+      openMenuKey: previousState.openMenuKey
+    };
+  }
+
+  if (event.type === 'RECENCY_FILTER_CHANGED') {
+    return {
+      ...previousState,
+      recencyFilterKey: RECENCY_FILTER_MAP[event.recencyFilterKey] ? event.recencyFilterKey : 'all',
+      openMenuKey: null
+    };
+  }
+
+  const nextState = {
+    ...previousState,
+    output: Object.prototype.hasOwnProperty.call(event, 'output') ? event.output : previousState.output,
+    error: Object.prototype.hasOwnProperty.call(event, 'error') ? event.error : previousState.error,
+    recencyFilterKey: RECENCY_FILTER_MAP[previousState.recencyFilterKey] ? previousState.recencyFilterKey : 'all',
+    openMenuKey: null
+  };
+
+  if (typeof nextState.output !== 'string') return nextState;
+
+  const optionIds = getAssigneeOptionIdsFromOutput(nextState.output);
+  if (!Array.isArray(previousState.selectedAssigneeIds)) {
+    nextState.selectedAssigneeIds = null;
+    return nextState;
+  }
+
+  const availableIds = new Set(optionIds);
+  const filteredSelectedIds = previousState.selectedAssigneeIds.filter((id) => availableIds.has(id));
+  nextState.selectedAssigneeIds = filteredSelectedIds.length === optionIds.length ? null : filteredSelectedIds;
+  return nextState;
+};
+
+export const init = (dispatch) => {
+  if (typeof document === 'undefined' || typeof window === 'undefined') return;
+
+  if (window.__jiraTasksDocumentClickHandler) {
+    document.removeEventListener('click', window.__jiraTasksDocumentClickHandler);
+  }
+
+  const handler = () => {
+    dispatch({ type: 'CLOSE_FILTER_MENUS' });
+  };
+
+  window.__jiraTasksDocumentClickHandler = handler;
+  document.addEventListener('click', handler);
+};
+
+const JiraTasksView = ({ data, selectedAssigneeIds, recencyFilterKey, openMenuKey, dispatch }) => {
   const baseUrl = data.baseUrl || '';
   const scope = data.scope || 'self';
   const isTeamScope = scope === 'team';
   const configuredTeamCount = Number(data.teamCount || 0);
-  const allIssues = (data.data && data.data.issues) ? data.data.issues : [];
-  const activePeopleCount = new Set(
-    allIssues
-      .map((it) => it.fields?.assignee?.accountId || it.fields?.assignee?.displayName)
-      .filter(Boolean)
-  ).size;
+  const allIssues = Array.isArray(data.data?.issues) ? data.data.issues : [];
+
+  const assigneeOptionsMap = new Map();
+  allIssues.forEach((issue) => {
+    const id = getAssigneeFilterId(issue);
+    const existing = assigneeOptionsMap.get(id);
+    if (existing) {
+      existing.count += 1;
+      return;
+    }
+    assigneeOptionsMap.set(id, { id, label: getAssigneeLabel(issue), count: 1 });
+  });
+
+  const assigneeOptions = Array.from(assigneeOptionsMap.values())
+    .sort((a, b) => a.label.localeCompare(b.label, 'tr'));
+  const optionIds = assigneeOptions.map((option) => option.id);
+  const showAssigneeFilter = isTeamScope && assigneeOptions.length > 1;
+  const showRecencyFilter = true;
+  const normalizedSelectedAssigneeIds = !showAssigneeFilter || selectedAssigneeIds === null
+    ? optionIds
+    : optionIds.filter((id) => selectedAssigneeIds.includes(id));
+  const selectedAssigneeSet = new Set(normalizedSelectedAssigneeIds);
+  const normalizedRecencyFilterKey = RECENCY_FILTER_MAP[recencyFilterKey] ? recencyFilterKey : 'all';
+  const normalizedViewModeKey = normalizeViewModeKey(data.viewModeKey);
+  const assigneeFilteredIssues = showAssigneeFilter
+    ? allIssues.filter((issue) => selectedAssigneeSet.has(getAssigneeFilterId(issue)))
+    : allIssues;
+  const filteredIssues = assigneeFilteredIssues.filter((issue) => matchesRecencyFilter(issue, normalizedRecencyFilterKey));
+  const totalPeopleCount = assigneeOptions.length || configuredTeamCount || 0;
+  const selectedPeopleCount = showAssigneeFilter ? normalizedSelectedAssigneeIds.length : totalPeopleCount;
+  const recencySummary = RECENCY_FILTER_MAP[normalizedRecencyFilterKey]?.summary || 'Tümü';
+  const visibleFilterCount = [showAssigneeFilter, showRecencyFilter].filter(Boolean).length;
+  const toolbarClassName = `jira-toolbar${visibleFilterCount === 1 ? ' is-single' : ''}`;
+  const selectedLabels = showAssigneeFilter
+    ? assigneeOptions
+        .filter((option) => selectedAssigneeSet.has(option.id))
+        .map((option) => option.label)
+    : [];
+  const filterSummary = !showAssigneeFilter
+    ? ''
+    : normalizedSelectedAssigneeIds.length === 0
+      ? 'Seçim yok'
+      : normalizedSelectedAssigneeIds.length === assigneeOptions.length
+        ? 'Tümü'
+        : normalizedSelectedAssigneeIds.length === 1
+          ? selectedLabels[0]
+          : `${normalizedSelectedAssigneeIds.length}/${assigneeOptions.length} kişi`;
+
+  const toggleAssignee = (id) => {
+    const current = new Set(normalizedSelectedAssigneeIds);
+    if (current.has(id)) current.delete(id);
+    else current.add(id);
+    const nextSelectedIds = optionIds.filter((optionId) => current.has(optionId));
+    dispatch({
+      type: 'ASSIGNEE_FILTER_CHANGED',
+      selectedAssigneeIds: nextSelectedIds.length === optionIds.length ? null : nextSelectedIds
+    });
+  };
+
+  const selectAllAssignees = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dispatch({ type: 'ASSIGNEE_FILTER_CHANGED', selectedAssigneeIds: null });
+  };
+
+  const clearAssignees = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dispatch({ type: 'ASSIGNEE_FILTER_CHANGED', selectedAssigneeIds: [] });
+  };
+
+  const changeRecencyFilter = (event, nextKey) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dispatch({ type: 'RECENCY_FILTER_CHANGED', recencyFilterKey: nextKey });
+  };
+
+  const toggleMenu = (event, menuKey) => {
+    event.preventDefault();
+    event.stopPropagation();
+    dispatch({ type: 'TOGGLE_MENU', menuKey });
+  };
+
+  const stopMenuClick = (event) => {
+    event.stopPropagation();
+  };
 
   // Jira issue URL yardımcıları (branch -> KEY -> URL)
   const toIssueUrl = (maybeKey) => {
@@ -669,7 +1032,7 @@ export const render = ({ output, error }) => {
 
   const uniqueAssigneeCount = (items) => new Set(
     items
-      .map((issue) => issue.fields?.assignee?.accountId || issue.fields?.assignee?.displayName)
+      .map((issue) => getAssigneeFilterId(issue))
       .filter(Boolean)
   ).size;
 
@@ -702,15 +1065,15 @@ export const render = ({ output, error }) => {
   };
 
   // Gruplama + done kırılım sayacı
-  const groups = { 
-    todo: [], 
-    inprogress: [], 
+  const groups = {
+    todo: [],
+    inprogress: [],
     done: [],
     doneCount: 0,
     doneBreakdown: { cr: 0, rft: 0, it: 0, rfu: 0, uat: 0, rfp: 0, done: 0 },
     doneGroups: { rft: [], it: [], rfu: [], uat: [], rfp: [], done: [] }
   };
-  allIssues.forEach((it) => {
+  filteredIssues.forEach((it) => {
     const cat = statusCategory(it.fields?.status?.name || '');
     if (cat === 'ignore') return;
     if (cat === 'todo') groups.todo.push(it);
@@ -718,7 +1081,7 @@ export const render = ({ output, error }) => {
     else {
       groups.done.push(it);
       groups.doneCount++;
-      const k = statusDetailedDone(it.fields?.status?.name || 'done'); // rft | it | rfu | uat | rfp | done
+      const k = statusDetailedDone(it.fields?.status?.name || 'done');
       groups.doneBreakdown[k] = (groups.doneBreakdown[k] || 0) + 1;
       if (groups.doneGroups[k]) groups.doneGroups[k].push(it);
     }
@@ -727,10 +1090,9 @@ export const render = ({ output, error }) => {
   const renderItem = (it, { doneMode = false } = {}) => {
     const f = it.fields || {};
     const prio = f.priority?.name;
-    const stat = f.status?.name;
     const due = f.duedate;
     const key = it.key;
-    const assigneeName = f.assignee?.displayName || 'Atanmamış';
+    const assigneeName = getAssigneeLabel(it);
     const title = doneMode ? key : safe(f.summary);
     const url = baseUrl ? `${baseUrl}/browse/${key}` : '';
     const prioClass = (() => {
@@ -740,7 +1102,6 @@ export const render = ({ output, error }) => {
       return 'prio-low';
     })();
 
-    // Done modunda sağ üstte branch chip'leri
     const branches = doneMode ? extractBranches(it) : [];
 
     return (
@@ -754,11 +1115,9 @@ export const render = ({ output, error }) => {
           <p className="jira-title">{title}</p>
           {!doneMode && (
             <div className="jira-meta">
-              {stat ? <span className="chip chip-status">{stat}</span> : null}
               {isTeamScope ? <span className="chip chip-assignee">{assigneeName}</span> : null}
-              {/* priority chip kaldırıldı */}
               {due ? <span className="chip chip-due">Son Tarih {new Date(due).toLocaleDateString('tr-TR')}</span> : null}
-              {f.updated ? <span className="chip">Güncel {fmtRel(f.updated)} önce</span> : null}
+              {f.updated ? <span className="chip">Güncel {fmtRel(f.updated)}</span> : null}
             </div>
           )}
         </div>
@@ -811,81 +1170,83 @@ export const render = ({ output, error }) => {
     );
   };
 
-  // Done satırı: birden çok satıra sarılabilen chip listesi
   const renderDoneRow = (label, items) => {
     if (!items || items.length === 0) return null;
+    const spotlight = label === 'RFT' || label === 'TEST';
     const seen = new Set();
     const chips = [];
     items.forEach((it) => {
+      const f = it.fields || {};
+      const summary = safe(f.summary) || it.key;
+      const assigneeName = getAssigneeLabel(it);
+      const updatedText = f.updated ? `Güncel ${fmtRel(f.updated)}` : '';
       const bs = extractBranches(it);
-      if (!bs || bs.length === 0) {
-        const key = it.key;
-        const low = key.toLowerCase();
-        if (!seen.has(low)) {
-          seen.add(low);
-          const kurl = toIssueUrl(key);
-          chips.push(
-            <a
-              key={key}
-              className="chip chip-branch"
-              href={kurl || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {key}
-            </a>
-          );
-        }
-      } else {
-        bs.forEach((b) => {
-          const low = b.toLowerCase();
-          if (!seen.has(low)) {
-            seen.add(low);
-            const burl = urlForBranch(b, it.key);
-            chips.push(
-              <a
-                key={b}
-                className="chip chip-branch"
-                href={burl || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {b}
-              </a>
-            );
-          }
-        });
-      }
+      const previews = bs && bs.length ? bs : [it.key];
+
+      previews.forEach((labelText) => {
+        const low = labelText.toLowerCase();
+        if (seen.has(low)) return;
+        seen.add(low);
+
+        chips.push(
+          <details key={`${label}-${it.key}-${labelText}`} className="jira-preview done-preview" onClick={(e) => e.stopPropagation()}>
+            <summary className={`chip chip-branch chip-button${spotlight ? ' chip-branch-focus' : ''}`} onClick={(e) => e.stopPropagation()}>
+              {labelText}
+            </summary>
+            <div className="jira-preview-popover" onClick={(e) => e.stopPropagation()}>
+              <div className="jira-preview-key">{it.key}</div>
+              <div className="jira-preview-title">{summary}</div>
+              <div className="jira-preview-meta">Atalı: {assigneeName}</div>
+              {updatedText ? <div className="jira-preview-meta">{updatedText}</div> : null}
+            </div>
+          </details>
+        );
+      });
     });
     return (
-      <div className="done-row" key={label}>
-        <div className="done-title">{label} ({items.length})</div>
+      <div className={`done-row${spotlight ? ' done-row-spotlight' : ''}`} key={label}>
+        <div className={`done-title${spotlight ? ' done-title-spotlight' : ''}`}>{label} ({items.length})</div>
         <div className="chips-row">{chips}</div>
       </div>
     );
   };
 
-  // Done özetini tek satır derle (sadece >0 olanlar)
   const dd = groups.doneBreakdown;
   const doneParts = [
     dd.rft ? `RFT ${dd.rft}` : null,
-    dd.it ? `Test ${dd.it}` : null,
+    dd.it ? `TEST ${dd.it}` : null,
     dd.rfu ? `R-UAT ${dd.rfu}` : null,
     dd.uat ? `UAT ${dd.uat}` : null,
-     dd.rfp ? `R-Prod ${dd.rfp}` : null,
+    dd.rfp ? `R-Prod ${dd.rfp}` : null,
     dd.done ? `Done ${dd.done}` : null
   ].filter(Boolean);
 
-  // Progress hesapları
   const totalCount = groups.todo.length + groups.inprogress.length + groups.doneCount;
   const percent = totalCount ? Math.round((groups.doneCount / totalCount) * 100) : 0;
   const headerTitle = isTeamScope ? 'Jira Aktif Görevler' : 'Jira Görevlerim (Aktif Sprint)';
   const headerMetaPrefix = isTeamScope
-    ? `Takım • ${activePeopleCount || configuredTeamCount || 0} kişi`
+    ? `Takım • ${showAssigneeFilter && selectedPeopleCount !== totalPeopleCount ? `${selectedPeopleCount}/${totalPeopleCount}` : totalPeopleCount} kişi`
     : '';
+  const emptyMessage = showAssigneeFilter && normalizedSelectedAssigneeIds.length === 0
+    ? 'Gösterilecek kişi seçilmedi.'
+    : normalizedRecencyFilterKey !== 'all' && assigneeFilteredIssues.length > 0 && filteredIssues.length === 0
+      ? 'Seçilen güncellik filtresinde görev bulunamadı.'
+    : 'Görev bulunamadı.';
+  const productDoneItems = [
+    ...groups.doneGroups.rfu,
+    ...groups.doneGroups.uat,
+    ...groups.doneGroups.rfp,
+    ...groups.doneGroups.done
+  ];
+  const productDoneParts = [
+    dd.rfu ? `R-UAT ${dd.rfu}` : null,
+    dd.uat ? `UAT ${dd.uat}` : null,
+    dd.rfp ? `R-Prod ${dd.rfp}` : null,
+    dd.done ? `Done ${dd.done}` : null
+  ].filter(Boolean);
 
   return (
-    <div className="jira-container">
+    <div className="jira-container" onClick={() => dispatch({ type: 'CLOSE_FILTER_MENUS' })}>
       <div className="jira-header">
         <span>{headerTitle}</span>
         <span style={{ fontSize: 10, color: '#9a9a9a' }}>
@@ -894,8 +1255,88 @@ export const render = ({ output, error }) => {
         </span>
       </div>
 
+      {(showAssigneeFilter || showRecencyFilter) ? (
+        <div className={toolbarClassName}>
+          {showAssigneeFilter ? (
+            <div className={`jira-filter ${openMenuKey === 'assignee' ? 'is-open' : ''}`} onClick={stopMenuClick}>
+              <button type="button" className="jira-filter-summary" onClick={(event) => toggleMenu(event, 'assignee')}>
+                <div>
+                  <div className="jira-filter-label">Kişi</div>
+                  <div className="jira-filter-value">{filterSummary}</div>
+                </div>
+                <div className="jira-filter-chevron">▾</div>
+              </button>
+              {openMenuKey === 'assignee' ? (
+                <div className="jira-filter-menu">
+                  <div className="jira-filter-actions">
+                    <button
+                      type="button"
+                      className="jira-filter-action"
+                      onClick={selectAllAssignees}
+                      disabled={normalizedSelectedAssigneeIds.length === assigneeOptions.length}
+                    >
+                      Tümü
+                    </button>
+                    <button
+                      type="button"
+                      className="jira-filter-action"
+                      onClick={clearAssignees}
+                      disabled={normalizedSelectedAssigneeIds.length === 0}
+                    >
+                      Temizle
+                    </button>
+                  </div>
+                  <div className="jira-filter-options">
+                    {assigneeOptions.map((option) => (
+                      <label key={option.id} className="jira-filter-option">
+                        <input
+                          type="checkbox"
+                          checked={selectedAssigneeSet.has(option.id)}
+                          onChange={() => toggleAssignee(option.id)}
+                        />
+                        <span className="jira-filter-option-name">{option.label}</span>
+                        <span className="jira-filter-option-count">{option.count}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          {showRecencyFilter ? (
+            <div className={`jira-filter ${openMenuKey === 'recency' ? 'is-open' : ''}`} onClick={stopMenuClick}>
+              <button type="button" className="jira-filter-summary" onClick={(event) => toggleMenu(event, 'recency')}>
+                <div>
+                  <div className="jira-filter-label">Güncellik</div>
+                  <div className="jira-filter-value">{recencySummary}</div>
+                </div>
+                <div className="jira-filter-chevron">▾</div>
+              </button>
+              {openMenuKey === 'recency' ? (
+                <div className="jira-filter-menu">
+                  <div className="jira-filter-options">
+                    {RECENCY_FILTER_OPTIONS.map((option) => (
+                      <label key={option.key} className="jira-filter-option jira-filter-option-simple">
+                        <input
+                          type="radio"
+                          name="jira-recency-filter"
+                          checked={normalizedRecencyFilterKey === option.key}
+                          onChange={(event) => changeRecencyFilter(event, option.key)}
+                        />
+                        <span className="jira-filter-option-name">{option.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+        </div>
+      ) : null}
+
       {(groups.todo.length === 0 && groups.inprogress.length === 0 && groups.done.length === 0) ? (
-        <div style={{ fontSize: 11, color: '#c8c8c8' }}>Görev bulunamadı.</div>
+        <div style={{ fontSize: 11, color: '#c8c8c8' }}>{emptyMessage}</div>
       ) : (
         <div className="jira-list">
           {renderGroup(
@@ -914,14 +1355,34 @@ export const render = ({ output, error }) => {
             groups.inprogress.map((it) => renderItem(it))
           )}
 
+          {normalizedViewModeKey === 'product' ? renderGroup(
+            'rft',
+            'RFT',
+            groups.doneGroups.rft,
+            buildGroupSummary(groups.doneGroups.rft),
+            <div className="done-groups">
+              {renderDoneRow('RFT', groups.doneGroups.rft)}
+            </div>
+          ) : null}
+
+          {normalizedViewModeKey === 'product' ? renderGroup(
+            'test',
+            'TEST',
+            groups.doneGroups.it,
+            buildGroupSummary(groups.doneGroups.it),
+            <div className="done-groups">
+              {renderDoneRow('TEST', groups.doneGroups.it)}
+            </div>
+          ) : null}
+
           {renderGroup(
             'done',
             'Tamamlanan',
-            groups.done,
-            buildGroupSummary(groups.done, doneParts),
+            normalizedViewModeKey === 'product' ? productDoneItems : groups.done,
+            buildGroupSummary(normalizedViewModeKey === 'product' ? productDoneItems : groups.done, normalizedViewModeKey === 'product' ? productDoneParts : doneParts),
             <div className="done-groups">
-              {renderDoneRow('RFT', groups.doneGroups.rft)}
-              {renderDoneRow('TEST', groups.doneGroups.it)}
+              {normalizedViewModeKey === 'developer' ? renderDoneRow('RFT', groups.doneGroups.rft) : null}
+              {normalizedViewModeKey === 'developer' ? renderDoneRow('TEST', groups.doneGroups.it) : null}
               {renderDoneRow('R-UAT', groups.doneGroups.rfu)}
               {renderDoneRow('UAT', groups.doneGroups.uat)}
               {renderDoneRow('RFP', groups.doneGroups.rfp)}
@@ -931,7 +1392,6 @@ export const render = ({ output, error }) => {
         </div>
       )}
 
-      {/* Progress bar */}
       <div className="jira-progress">
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#9a9a9a', marginBottom: 4 }}>
           <span>İlerleme</span>
@@ -948,4 +1408,26 @@ export const render = ({ output, error }) => {
       </div>
     </div>
   );
+};
+
+export const render = ({ output, error, selectedAssigneeIds, recencyFilterKey, openMenuKey }, dispatch) => {
+  if (error) {
+    return <div className="jira-container">Hata: {String(error)}</div>;
+  }
+  let data = {};
+  try { data = JSON.parse(output || '{}'); } catch { data = {}; }
+
+  if (!data.ok) {
+    const missing = (data.missing || []).join(', ');
+    return (
+      <div className="jira-container">
+        <div className="jira-header">Jira Görevlerim</div>
+        <div style={{ fontSize: 11, color: '#c8c8c8' }}>
+          {data.error || 'Çıktı okunamadı.'}
+          {missing ? <div>Eksik: {missing}</div> : null}
+        </div>
+      </div>
+    );
+  }
+  return <JiraTasksView data={data} selectedAssigneeIds={selectedAssigneeIds} recencyFilterKey={recencyFilterKey} openMenuKey={openMenuKey} dispatch={dispatch} />;
 };
